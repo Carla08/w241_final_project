@@ -1,0 +1,80 @@
+---
+title: "What's in a name"
+author: "Emily Robles, Jessica Huber, Carla Prieto"
+date: "12/19/2023"
+name: ""
+output: 
+  pdf_document: 
+    number_sections: true
+---
+
+```{r global options, include = FALSE}
+knitr::opts_chunk$set(include = FALSE, message = FALSE, warning = FALSE )
+
+knitr::knit_engines$set(problem_description = function(options) {
+  code <- paste(options$code, collapse = "\n")
+})
+```
+
+```{r load packages, warning=FALSE, message=FALSE}
+library(data.table)
+
+library(sandwich)
+library(lmtest)
+
+library(ggplot2)
+library(patchwork)
+
+library(foreign)
+inline_reference <- "r inline_reference"
+knitr::opts_chunk$set(echo = FALSE)
+library(stargazer)
+```
+
+```{r, include=FALSE}
+d <-read.csv("recruiters.csv")
+d <- data.table(d)
+```
+
+
+
+```{r}
+# Attrition
+non_contacted_recruiters <- subset(d, d$Connection.Sent == "")
+non_contacted_recruiters
+```
+
+```{r}
+# Regression
+d <-read.csv("connections_treat_control.csv")
+d <- data.table(d)
+mod_basic <- d[ , lm(connections ~ factor(name))]
+print(coeftest(mod_basic))
+coeff <- coefci(mod_basic, level = 0.95)
+coeff
+```
+
+```{r}
+# Regression
+d <-read.csv("connections.csv")
+d <- data.table(d)
+mod_race <- d[ , lm(connections ~ factor(name))]
+print(coeftest(mod_race))
+coeff <- coefci(mod_race, level = 0.95)
+coeff
+```
+```{r}
+# Regression
+mod_gender <- d[ , lm(connections ~ factor(gender))]
+print(coeftest(mod_gender))
+coeff <- coefci(mod_gender, level = 0.95)
+coeff
+```
+
+```{r}
+# Regression
+mod_gender_race <- d[ , lm(connections ~ factor(name) + factor(gender))]
+print(coeftest(mod_gender_race))
+coeff <- coefci(mod_gender, level = 0.95)
+coeff
+```
